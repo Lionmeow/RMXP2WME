@@ -1,8 +1,8 @@
 ﻿using OneShotMG.src.Entities;
 
-namespace RMXP2WME
+namespace RMXP2WME.Event
 {
-    public class EventRMXPSerializable
+    public class EventFixed
     {
         public int id;
         public string name = string.Empty;
@@ -12,8 +12,8 @@ namespace RMXP2WME
 
         public class Page
         {
-            public Event.Page.Condition condition;
-            public Event.Page.Graphic graphic;
+            public OneShotMG.src.Entities.Event.Page.Condition condition;
+            public OneShotMG.src.Entities.Event.Page.Graphic graphic;
             public int move_type;
             public int move_speed = 2;
             public int move_frequency = 2;
@@ -25,7 +25,7 @@ namespace RMXP2WME
             public bool always_on_top;
             public bool always_on_bottom;
             public int trigger;
-            public EventCommandRMXPSerializable[] list;
+            public EventCommandFixed[] list;
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using OneShotMG.src.Entities;
 
-namespace RMXP2WME
+namespace RMXP2WME.Event
 {
-    public class EventCommandRMXPSerializable
+    public class EventCommandFixed
     {
         public int code;
         public int indent;
         public object[] parameters; // literally the one reason that this needs to exist. agony.
-        public MoveRouteRMXPSerializable move_route;
+        public MoveRouteRMXPFixed move_route;
         public AudioFile audio_file;
     }
 }

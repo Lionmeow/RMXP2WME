@@ -1,6 +1,6 @@
 ﻿using OneShotMG.src.Map;
 
-namespace RMXP2WME
+namespace RMXP2WME.WME.Map
 {
     public class TilesetInfoJsonFull : TilesetInfoJson
     {

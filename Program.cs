@@ -1,5 +1,8 @@
 ﻿using Newtonsoft.Json;
 using OneShotMG.src.Entities;
+using RMXP2WME.Event;
+using RMXP2WME.RMXP.Map;
+using RMXP2WME.WME.Map;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -119,7 +122,7 @@ namespace RMXP2WME
                     if (Path.GetExtension(file) != ".json")
                         continue;
 
-                    RMXPJson json = null;
+                    RMXPMapJson json = null;
                     try
                     {
                         json = CreateAndProcessJSON(file, idMap, remapTransitions);
@@ -145,7 +148,7 @@ namespace RMXP2WME
                     return;
                 }
 
-                RMXPJson json = CreateAndProcessJSON(inputPath, idMap, remapTransitions);
+                RMXPMapJson json = CreateAndProcessJSON(inputPath, idMap, remapTransitions);
                 if (!ProcessAndOutputWME(json, outputPath, Path.GetFileNameWithoutExtension(inputPath), overwrite))
                     Console.WriteLine($"Did not fully export {inputPath}");
             }
@@ -179,18 +182,18 @@ namespace RMXP2WME
             //Console.WriteLine("-r - Generates files with 'mapXXX' naming scheme instead of keeping the original filename");
         }
 
-        public static RMXPJson CreateAndProcessJSON(string inputPath, Dictionary<int, int> remap, bool remapTransitions)
+        public static RMXPMapJson CreateAndProcessJSON(string inputPath, Dictionary<int, int> remap, bool remapTransitions)
         {
             // I hope I did this right????
-            RMXPJson json = JsonConvert.DeserializeObject<RMXPJson>(File.ReadAllText(inputPath));
+            RMXPMapJson json = JsonConvert.DeserializeObject<RMXPMapJson>(File.ReadAllText(inputPath));
 
             // handle bad event command paramters that break everything
-            foreach (EventRMXPSerializable ev in json.data.events)
+            foreach (EventFixed ev in json.data.events)
             {
-                foreach (EventRMXPSerializable.Page p in ev.pages)
+                foreach (EventFixed.Page p in ev.pages)
                 {
                     p.list = p.list.Where(x => x.code != 509).ToArray();
-                    foreach (EventCommandRMXPSerializable command in p.list)
+                    foreach (EventCommandFixed command in p.list)
                     {
                         if (remapTransitions && command.code == 122 && command.parameters[0].ToString() == "6")
                         {
@@ -210,7 +213,7 @@ namespace RMXP2WME
                         // bad awful terrible stupid bad code
                         if (command.move_route != null)
                         {
-                            foreach (MoveCommandRMXPSerializable movecommand in command.move_route.list)
+                            foreach (MoveCommandFixed movecommand in command.move_route.list)
                             {
                                 for (int i = 0; i < movecommand.parameters.Length; i++)
                                 {
@@ -236,7 +239,7 @@ namespace RMXP2WME
         }
 
         // returns true if export was successful, otherwise false
-        public static bool ProcessAndOutputWME(RMXPJson json, string outputPath, string name, bool forceContinue)
+        public static bool ProcessAndOutputWME(RMXPMapJson json, string outputPath, string name, bool forceContinue)
         {
             string eventsName = Path.Combine(outputPath, $"events_{name}.json");
             string tilesName = Path.Combine(outputPath, $"{name}.tmx");
@@ -276,7 +279,7 @@ namespace RMXP2WME
             // spitting out events and music is easy; game already has existing data classes for this and said data classes are tiny
             try
             {
-                MapEventsRMXPSerializable events = new MapEventsRMXPSerializable();
+                MapEventsFixed events = new MapEventsFixed();
                 events.events = json.data.events;
                 using (StreamWriter sw = File.CreateText(eventsName))
                     sw.Write(JsonConvert.SerializeObject(events, Formatting.Indented));

@@ -1,4 +1,4 @@
-﻿namespace RMXP2WME
+﻿namespace RMXP2WME.RMXP.Map
 {
     public class RMXPTiles
     {

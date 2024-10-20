@@ -1,8 +1,9 @@
 ﻿using OneShotMG.src.Entities;
+using RMXP2WME.Event;
 
-namespace RMXP2WME
+namespace RMXP2WME.RMXP.Map
 {
-    public class RMXPData
+    public class RMXPMapData
     {
         public int tileset_id;
         public int width;
@@ -13,6 +14,6 @@ namespace RMXP2WME
         public object[] encounter_list;
         public int encounter_step;
         public RMXPTiles data;
-        public EventRMXPSerializable[] events;
+        public EventFixed[] events;
     }
 }

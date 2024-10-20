@@ -1,8 +1,8 @@
 ﻿using OneShotMG.src.Entities;
 
-namespace RMXP2WME
+namespace RMXP2WME.Event
 {
-    public class MoveCommandRMXPSerializable
+    public class MoveCommandFixed
     {
         public int code;
         public object[] parameters;
