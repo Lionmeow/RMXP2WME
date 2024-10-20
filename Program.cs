@@ -22,9 +22,8 @@ namespace RMXP2WME
 
             string inputPath = string.Empty;
             string outputPath = string.Empty;
-            bool overwrite = false;
-            bool useNamingScheme = false;
-            bool remapTransitions = false;
+            ProgramFlags flags = ProgramFlags.None;
+            
             Dictionary<int, int> idMap = new Dictionary<int, int>();
 
             for (int i = 0; i < args.Length; i++)
@@ -57,10 +56,15 @@ namespace RMXP2WME
 
                         outputPath = Path.GetFullPath(args[i]);
                         break;
-                    case "-c":
-                        overwrite = true;
+                    case "-f":
+                        Console.WriteLine("WARNING: Overwrite files specified.");
+                        Console.WriteLine("If you like any conflicting files, you've made a grave mistake.");
+                        flags |= ProgramFlags.FORCE_EXPORT;
                         break;
-                    case "-m:rr":
+                    case "-m":
+                        flags |= ProgramFlags.EXPORT_MAP;
+                        break;
+                    case "-m:r":
                         int from;
                         int to;
 
@@ -83,14 +87,14 @@ namespace RMXP2WME
 
                         idMap[from] = to;
                         break;
+                    case "-m:rm":
+                        flags |= ProgramFlags.REMAP_ROOM_MOVE;
+                        break;
                     case "-m:rt":
                         Console.WriteLine("WARNING: Transition remap option selected.");
                         Console.WriteLine("If your room transitions don't use the same variables as OneShot, you're gonna have a bad time!");
-                        remapTransitions = true;
+                        flags |= ProgramFlags.REMAP_ROOM_TRANSITION;
                         break;
-                    /*case "-r":
-                        useNamingScheme = true;
-                        break;*/
                     default:
                         Console.WriteLine($"Unknown argument: {args[i]}");
                         Console.WriteLine();
@@ -118,20 +122,7 @@ namespace RMXP2WME
                     Directory.CreateDirectory(outputPath);
 
                 foreach (string file in Directory.GetFiles(inputPath))
-                {
-                    if (Path.GetExtension(file) != ".json")
-                        continue;
-
-                    RMXPMapJson json = null;
-                    try
-                    {
-                        json = CreateAndProcessJSON(file, idMap, remapTransitions);
-                    }
-                    catch { continue; }
-
-                    if (!ProcessAndOutputWME(json, outputPath, Path.GetFileNameWithoutExtension(file), overwrite))
-                        Console.WriteLine($"Did not fully export {file}");
-                }
+                    ProcessFile(inputPath, outputPath, idMap, flags);
             }
             else if (File.Exists(inputPath))
             {
@@ -140,17 +131,7 @@ namespace RMXP2WME
                 if (!Directory.Exists(outputPath))
                     Directory.CreateDirectory(outputPath);
 
-                if (Path.GetExtension(inputPath) != ".json")
-                {
-                    Console.WriteLine($"Specified file is not a JSON file ({inputPath})");
-                    Console.WriteLine();
-                    Help();
-                    return;
-                }
-
-                RMXPMapJson json = CreateAndProcessJSON(inputPath, idMap, remapTransitions);
-                if (!ProcessAndOutputWME(json, outputPath, Path.GetFileNameWithoutExtension(inputPath), overwrite))
-                    Console.WriteLine($"Did not fully export {inputPath}");
+                ProcessFile(inputPath, outputPath, idMap, flags);
             }
             else
             {
@@ -169,23 +150,104 @@ namespace RMXP2WME
             Console.WriteLine("-i <path-to-input> - JSON file exported via rmxp_extractor, or a directory containing many JSON files");
             Console.WriteLine("-o <path-to-output> - Location to export WME files to. Exports in the same directory as input if not specified.");
             Console.WriteLine();
-            Console.WriteLine("-c - Force overwrites any conflicting files");
+            Console.WriteLine("-f - Force overwrites any conflicting files");
             Console.WriteLine();
-            Console.WriteLine("-m - Enables map conversion"); // TODO: unimplemented
-            Console.WriteLine("-m:rr <from> <to> - Remaps every instance of a room ID to a new room ID within events");
-            Console.WriteLine("-m:rt - Performs event ID remap operations on room transitions");
+            Console.WriteLine("-m - Enables map conversion");
+            Console.WriteLine("-m:r <from> <to> - Specifies a room ID to change instances of to a new room ID");
+            Console.WriteLine("-m:rm  - Remaps room IDs in Room Move event commands");
+            Console.WriteLine("-m:rt - Remaps room IDs in room transitions");
             Console.WriteLine();
             Console.WriteLine("-t - Enables tileset conversion"); // TODO: this and next two unimplemented!!
             Console.WriteLine("-t:p - Creates a patched WME tileset file");
             Console.WriteLine("-t:l - Creates a file detailing all tileset changes");
-            // unable to be done because IDs do not exist outside of the file name
-            //Console.WriteLine("-r - Generates files with 'mapXXX' naming scheme instead of keeping the original filename");
         }
 
-        public static RMXPMapJson CreateAndProcessJSON(string inputPath, Dictionary<int, int> remap, bool remapTransitions)
+        // returns true if continue, else false
+        public static bool ProcessOutputDirectory(string path, string sourceFile, params string[] filesToCreate)
         {
-            // I hope I did this right????
-            RMXPMapJson json = JsonConvert.DeserializeObject<RMXPMapJson>(File.ReadAllText(inputPath));
+            bool hasConflict = false;
+            foreach (string name in filesToCreate)
+            {
+                string pathToCreate = Path.Combine(path, name);
+                if (File.Exists(pathToCreate))
+                {
+                    hasConflict = true;
+                    break;
+                }
+            }
+
+            if (hasConflict)
+            {
+                // don't want users to unknowingly overwrite files!!
+                Console.WriteLine($"Conflicting file(s) in output directory ({path}) when processing {sourceFile}.");
+                bool doContinue = false;
+                while (true)
+                {
+                    Console.WriteLine("Continue? [y/n]");
+                    string answer = Console.ReadLine();
+                    if (answer.ToLower() == "y" || answer.ToLower() == "n")
+                    {
+                        doContinue = answer.ToLower() == "y";
+                        break;
+                    }
+                    Console.WriteLine("Invalid input.");
+                }
+
+                if (!doContinue)
+                    return false;
+            }
+
+            return true;
+        }
+        public static bool ProcessFile(string input, string outputPath, Dictionary<int, int> remap, ProgramFlags flags)
+        {
+            string name = Path.GetFileName(input);
+            string safeName = Path.GetFileNameWithoutExtension(input);
+
+            if (Path.GetExtension(input) != ".json")
+            {
+                Console.WriteLine($"{name} is not a .JSON file. Skipping ...");
+                return false;
+            }
+
+            bool forceExport = (flags & ProgramFlags.FORCE_EXPORT) == ProgramFlags.FORCE_EXPORT;
+            if ((flags & ProgramFlags.EXPORT_MAP) == ProgramFlags.EXPORT_MAP && 
+                TryParseMapJSON(input, remap, (flags & ProgramFlags.REMAP_ROOM_MOVE) == ProgramFlags.REMAP_ROOM_MOVE, 
+                (flags & ProgramFlags.REMAP_ROOM_TRANSITION) == ProgramFlags.REMAP_ROOM_TRANSITION, out RMXPMapJson json))
+            {
+                if (!forceExport && !ProcessOutputDirectory(outputPath, $"events_{safeName}.json", $"{safeName}.tmx", $"music_{safeName}.json"))
+                {
+                    Console.WriteLine($"Conflicting files for {name}. Skipping ...");
+                    return false;
+                }
+
+                if (!ProcessAndOutputWMEMap(json, outputPath, safeName, forceExport))
+                {
+                    Console.WriteLine($"Did not fully export map for {name}");
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"{name} did not match any enabled export types. Skipping ...");
+                return false;
+            }
+        }
+
+        public static bool TryParseMapJSON(string inputPath, Dictionary<int, int> remap, bool remapMoveCommands, bool remapTransitions, out RMXPMapJson json)
+        {
+            try
+            {
+                // I hope I did this right????
+                json = JsonConvert.DeserializeObject<RMXPMapJson>(File.ReadAllText(inputPath));
+            }
+            catch
+            {
+                // is this good practice
+                json = null;
+                return false;
+            }
 
             // handle bad event command paramters that break everything
             foreach (EventFixed ev in json.data.events)
@@ -235,46 +297,14 @@ namespace RMXP2WME
                 }
             }
 
-            return json;
+            return true;
         }
-
         // returns true if export was successful, otherwise false
-        public static bool ProcessAndOutputWME(RMXPMapJson json, string outputPath, string name, bool forceContinue)
+        public static bool ProcessAndOutputWMEMap(RMXPMapJson json, string outputPath, string name, bool forceContinue)
         {
             string eventsName = Path.Combine(outputPath, $"events_{name}.json");
             string tilesName = Path.Combine(outputPath, $"{name}.tmx");
             string musicName = Path.Combine(outputPath, $"music_{name}.json");
-
-            if (Directory.Exists(outputPath))
-            {
-                if (!forceContinue)
-                {
-                    if (File.Exists(eventsName) ||
-                    File.Exists(tilesName) ||
-                    File.Exists(musicName))
-                    {
-                        // don't want users to unknowingly overwrite files!!
-                        Console.WriteLine($"Conflicting files in target directory ({outputPath}).");
-                        bool doContinue = false;
-                        while (true)
-                        {
-                            Console.WriteLine("Continue? [y/n]");
-                            string answer = Console.ReadLine();
-                            if (answer.ToLower() == "y" || answer.ToLower() == "n")
-                            {
-                                doContinue = answer.ToLower() == "y";
-                                break;
-                            }
-                            Console.WriteLine("Invalid input.");
-                        }
-
-                        if (!doContinue)
-                            return false;
-                    }
-                }
-            }
-            else Directory.CreateDirectory(outputPath);
-
 
             // spitting out events and music is easy; game already has existing data classes for this and said data classes are tiny
             try
