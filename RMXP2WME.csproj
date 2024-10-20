@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+	<WMEPath>E:\Steam\steamapps\common\OneShot World Machine Edition</WMEPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -34,16 +35,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="INIFileParser">
-      <HintPath>E:\Steam\steamapps\common\OneShot World Machine Edition\INIFileParser.dll</HintPath>
+      <HintPath>$(WMEPath)\INIFileParser.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
-      <HintPath>E:\Steam\steamapps\common\OneShot World Machine Edition\MonoGame.Framework.dll</HintPath>
+      <HintPath>$(WMEPath)\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>E:\Steam\steamapps\common\OneShot World Machine Edition\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(WMEPath)\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OneShotMG">
-      <HintPath>E:\Steam\steamapps\common\OneShot World Machine Edition\OneShotMG.exe</HintPath>
+      <HintPath>$(WMEPath)\OneShotMG.exe</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
