@@ -122,7 +122,7 @@ namespace RMXP2WME
                     Directory.CreateDirectory(outputPath);
 
                 foreach (string file in Directory.GetFiles(inputPath))
-                    ProcessFile(inputPath, outputPath, idMap, flags);
+                    ProcessFile(file, outputPath, idMap, flags);
             }
             else if (File.Exists(inputPath))
             {

@@ -61,6 +61,7 @@
     <Compile Include="Data\Event\MoveCommandFixed.cs" />
     <Compile Include="Data\Event\MoveRouteRMXPFixed.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramFlags.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\RMXP\Map\RMXPMapData.cs" />
     <Compile Include="Data\RMXP\Map\RMXPMapJson.cs" />
