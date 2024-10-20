@@ -1,6 +1,6 @@
-﻿using RMXP2WME.Event;
+﻿using RMXP2WME.Data.Event;
 
-namespace RMXP2WME.WME.Map
+namespace RMXP2WME.Data.WME.Map
 {
     public class MapEventsFixed
     {

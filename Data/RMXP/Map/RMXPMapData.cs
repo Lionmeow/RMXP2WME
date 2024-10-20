@@ -1,7 +1,7 @@
 ﻿using OneShotMG.src.Entities;
-using RMXP2WME.Event;
+using RMXP2WME.Data.Event;
 
-namespace RMXP2WME.RMXP.Map
+namespace RMXP2WME.Data.RMXP.Map
 {
     public class RMXPMapData
     {

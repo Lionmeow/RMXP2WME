@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using OneShotMG.src.Entities;
-using RMXP2WME.Event;
-using RMXP2WME.RMXP.Map;
-using RMXP2WME.WME.Map;
+using RMXP2WME.Data.Event;
+using RMXP2WME.Data.RMXP.Map;
+using RMXP2WME.Data.WME.Map;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -418,7 +418,7 @@ namespace RMXP2WME
                         name = $"Tile Layer {i + 1}",
                         width = json.data.data.xsize,
                         height = json.data.data.ysize,
-                        data = new Data()
+                        data = new Tiled.Data()
                         {
                             compressionSpecified = false,
                             encoding = Encoding.csv,

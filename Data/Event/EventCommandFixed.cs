@@ -1,6 +1,6 @@
 ﻿using OneShotMG.src.Entities;
 
-namespace RMXP2WME.Event
+namespace RMXP2WME.Data.Event
 {
     public class EventCommandFixed
     {

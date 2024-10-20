@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RMXP2WME.WME.Map
+namespace RMXP2WME.Data.WME.Map
 {
     public class TilesetsInfoJsonFull
     {

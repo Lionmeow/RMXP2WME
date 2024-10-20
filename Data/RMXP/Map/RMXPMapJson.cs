@@ -1,4 +1,4 @@
-﻿namespace RMXP2WME.RMXP.Map
+﻿namespace RMXP2WME.Data.RMXP.Map
 {
     public class RMXPMapJson
     {

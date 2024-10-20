@@ -55,18 +55,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventCommandRMXPSerializable.cs" />
-    <Compile Include="EventRMXPSerializable.cs" />
-    <Compile Include="MapEventsRMXPSerializable.cs" />
-    <Compile Include="MoveCommandRMXPSerializable.cs" />
-    <Compile Include="MoveRouteRMXPSerializable.cs" />
+    <Compile Include="Data\Event\EventCommandFixed.cs" />
+    <Compile Include="Data\Event\EventFixed.cs" />
+    <Compile Include="Data\WME\Map\MapEventsFixed.cs" />
+    <Compile Include="Data\Event\MoveCommandFixed.cs" />
+    <Compile Include="Data\Event\MoveRouteRMXPFixed.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RMXPData.cs" />
-    <Compile Include="RMXPJson.cs" />
-    <Compile Include="RMXPTiles.cs" />
-    <Compile Include="TilesetInfoJsonFull.cs" />
-    <Compile Include="TilesetsInfoJsonFull.cs" />
+    <Compile Include="Data\RMXP\Map\RMXPMapData.cs" />
+    <Compile Include="Data\RMXP\Map\RMXPMapJson.cs" />
+    <Compile Include="Data\RMXP\Map\RMXPTiles.cs" />
+    <Compile Include="Data\WME\Map\TilesetInfoJsonFull.cs" />
+    <Compile Include="Data\WME\Map\TilesetsInfoJsonFull.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
