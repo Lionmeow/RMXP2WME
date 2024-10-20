@@ -1,4 +1,4 @@
-Tool for converting RMXP files to files understandable by WME<br />
+Tool for converting RMXP files to files understandable by OneShot: World Machine Edition<br />
 Utilizes a modified version of [RMXP-Extractor](https://github.com/Speak2Erase/RMXP-Extractor) to generate JSONs from RMXP binaries<p />
 Still WIP, will VERY likely change in the future!<p />
 
